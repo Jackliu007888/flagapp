@@ -1,0 +1,180 @@
+.animated 
+  animation-duration 1s
+  animation-fill-mode both
+  &.fastest
+    animation-duration 150ms
+  &.faster
+    animation-duration 300ms
+  &.fast
+    animation-duration 500ms
+  &.slow
+    animation-duration 2s
+  &.slower
+    animation-duration 3s
+    
+.slideOutDown 
+  animation-name slideOutDown
+.slideInUp
+  animation-name slideInUp
+.zoomIn
+  animation-name zoomIn
+.zoomOut
+  animation-name zoomOut
+.zoomInLeft
+  animation-name zoomInLeft
+.recordIn
+  animation-name recordIn
+  animation-timing-function ease-out
+.recordOut
+  animation-name recordOut
+  animation-timing-function ease-out
+.mineIn
+  animation-name mineIn
+  animation-timing-function ease-in
+.mineOut
+  animation-name mineOut
+  animation-timing-function ease-out
+.recordIn
+  animation-name recordIn
+  animation-timing-function ease-in
+.recordOut
+  animation-name recordOut
+  animation-timing-function ease-out
+.awardIn
+  animation-name awardIn
+  animation-timing-function ease-in
+.awardOut
+  animation-name awardOut
+  animation-timing-function ease-out
+.fadeIn
+  animation-name fadeIn
+.fadeOut
+  animation-name fadeOut
+.hiddenIn
+  animation-name hiddenIn
+.hiddenOut
+  animation-name hiddenOut
+
+@keyframes slideOutDown 
+  from 
+    transform translate3d(0, 0, 0)
+  to 
+    visibility hidden
+    transform translate3d(0, 100%, 0)
+
+@keyframes slideInUp 
+  from 
+    transform translate3d(0, 100%, 0)
+    visibility visible
+  to 
+    transform translate3d(0, 0, 0)
+
+@keyframes zoomIn 
+  from 
+    opacity 0
+    transform scale3d(0.3, 0.3, 0.3)
+  50% 
+    opacity 1
+
+@keyframes zoomOut
+  from 
+    opacity 1
+  50% 
+    opacity 0
+    transform scale3d(0.3, 0.3, 0.3)
+  to 
+    opacity 0
+
+@keyframes zoomInLeft 
+  from 
+    opacity 0
+    transform scale3d(0.1, 0.1, 0.1) translate3d(-1000px, 0, 0)
+    animation-timing-function cubic-bezier(0.55, 0.055, 0.675, 0.19)
+  60% 
+    opacity: 1
+    transform scale3d(0.475, 0.475, 0.475) translate3d(10px, 0, 0)
+    animation-timing-function cubic-bezier(0.175, 0.885, 0.32, 1)
+
+@keyframes recordIn
+  from 
+    opacity 0
+    left 0
+    top 0
+  to
+    opacity 1
+    left -5.05rem
+    top -2.35rem
+
+@keyframes recordOut
+  from 
+    opacity 1
+    left -5.05rem
+    top -2.35rem
+  to
+    opacity 0
+    left 0
+    top 0
+
+@keyframes mineIn
+  from 
+    opacity 0
+    left 0
+    top 0
+  to
+    opacity 1
+    left -0.55rem
+    top -4.65rem
+
+@keyframes mineOut
+  from 
+    opacity 1
+    left -0.55rem
+    top -4.65rem
+  to
+    opacity 0
+    left 0
+    top 0
+@keyframes awardIn
+  from 
+    opacity 0
+    left 0
+    top 0
+  to
+    opacity 1
+    left 3.9rem
+    top -2.35rem
+
+@keyframes awardOut
+  from 
+    opacity 1
+    left 3.9rem
+    top -2.35rem
+  to
+    opacity 0
+    left 0
+    top 0
+
+@keyframes fadeIn 
+  from 
+    opacity 0
+  to 
+    opacity 1
+
+@keyframes fadeOut 
+  from 
+    opacity 1
+  to 
+    opacity 0
+@keyframes hiddenIn 
+  from 
+    opacity 1
+  to 
+    display none
+    opacity 0
+@keyframes hiddenOut 
+  from 
+    opacity 0
+    display none
+  to 
+    opacity 1
+    display block
