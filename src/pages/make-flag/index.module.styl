@@ -1,0 +1,323 @@
+.main
+  position relative
+  width 100%
+  height 100%
+  .select-main
+    position absolute
+    left 0
+    top 0
+    width 100%
+    height 100%
+    .fold-click-box
+      z-index -10
+      width 100%
+      height 100%
+      top 0
+      position absolute
+      &.come-front
+        z-index 100
+      .fold-click-bg
+        width 100%
+        height 100%
+        top 0
+        position absolute
+      .fold-box
+        display none
+        z-index 100
+        background-color #ececec
+        width 321px
+        height 425px
+        border 0.5px solid #101010
+        position absolute
+        top 90px
+        left 27px
+        box-sizing border-box
+        transform-origin 0 0
+        &.come-front
+          z-index 100
+          transform scale(0)
+          &.open-fold
+            transform scale(1)
+        &.add-transform
+          transition all linear .2s
+        &.show
+          display block
+        .close-fold
+          width 76.5px
+          height 59.5px
+          background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/close_fold.png') no-repeat
+          background-position bottom
+          position absolute
+          top -30px
+        .fold-intro
+          width 150px
+          height 16px
+          background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/fold_intro.png') no-repeat
+          position absolute
+          top 11px
+          left 146px
+        .fold-main-padding-box
+          margin-top 45px
+          position absolute
+          top 0
+          width 100%
+          max-height 355px
+          padding 10px 0 20px
+          box-sizing border-box
+          overflow hidden
+          .fold-main-box
+            width 100%
+            overflow-y scroll
+          .fold-main
+            margin 0
+            padding 0
+            list-style none
+            height 87px
+            top 0
+            position relative
+            li
+              transition all linear .2s
+              font-size 16px
+              position absolute
+              .li-index
+                width 32px
+                padding-top 5.5px
+                position absolute
+                text-align right 
+                transition all linear 0.1s
+                box-sizing border-box
+              .li-main
+                width 246px
+                border 0.5px solid #101010
+                line-height 20px
+                margin-left 37.5px
+                padding-top 3px
+                padding-bottom 3px
+                position relative
+                transform scale(1)
+                transition all linear .1s
+                .li-text
+                  width 210px
+                  margin-left 13px
+                .li-delete
+                  transition all linear 0.1s
+                  width 23.5px
+                  height 23.5px
+                  background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/delete.png') no-repeat
+                  background-position center center
+                  right 0
+                  top 0
+                  position absolute
+
+    .s-top
+      width 321px
+      height 42px
+      background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/top_bg2.png') no-repeat
+      position absolute
+      top 69.5px
+      left 27px
+      .top-num
+        font-size 15px
+        line-height 15px
+        color #000000
+        margin 4.5px 0 0 20px
+      .top-select-text
+        width 45.5px
+        height 14px
+        position absolute
+        background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/top_select_text.png') no-repeat
+        top 26px
+        left 1px
+      .s-top-tips
+        display none
+        position absolute
+        left 2.5px
+        top 45px
+        .s-top-tips-line
+          width 11px
+          height 19px
+          background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/tips_line.png') no-repeat
+          position absolute
+          top 0
+        .s-top-tips-text
+          width 130px
+          height 16px
+          background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/tips_text.png') np-repeat
+          position absolute
+          top 9px
+          left 13px
+
+      .open-select
+        width 50px
+        height 40.5px
+        position absolute
+        top 0
+
+    .box
+      position absolute
+      width 100%
+      top 184px
+      left 42.5px
+      margin 0
+      padding 0
+      box-sizing border-box
+      list-style none
+      .s-li
+        width 130px
+        position absolute
+        -webkit-perspective 1000
+        .num
+          font-size 15px
+          color #000000
+          width 16px
+          height 18px
+          background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/unchosen.png') right bottom no-repeat
+        .text
+          font-size 18px
+          color #ff4b30
+          height 21.5px
+          position relative
+          transform-style preserve-3d
+          & > div
+            font-family text
+            position absolute
+            top 0
+            transition all ease 0.5s
+        &:nth-child(1)
+          top 0
+          left 0
+        &:nth-child(2)
+          top 0
+          left 160px
+        &:nth-child(3)
+          top 86px
+          left 0
+        &:nth-child(4)
+          top 86px
+          left 160px
+        &:nth-child(5)
+          top 172px
+          left 0px
+        &:nth-child(6)
+          top 172px
+          left 160px
+
+    .hand-box
+      position absolute
+      left 76px
+      top 216.5px
+      .hand
+        position absolute
+        top 4.5px
+        left 5px
+        width 15px
+        height 17.5px
+        opacity 0
+        background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/hand.png') no-repeat
+      .hand-text
+        width 78px
+        height 16px
+        background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/hand_text1.png') no-repeat
+        position absolute
+        top 8px
+        left 22.5px
+        opacity 0
+        transition all linear 0.3s
+      &.hand-ani
+        .hand-text
+          opacity 1
+        .hand
+          animation s 1.5s ease infinite
+    .change
+      position absolute
+      width 67.5px
+      height 67.5px
+      left 154px
+      bottom 155px
+      .change-bg
+        width 67.5px
+        height 67.5px
+        border 1px solid #ff4b30
+        position absolute
+        top 0
+        box-sizing border-box
+      .change-rotate
+        width 67.5px
+        height 67.5px
+        background-color #ff4b30
+        position absolute
+        top 0
+      .change-text
+        position absolute
+        width 67.5px
+        height 15.5px
+        background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/change_text1.png') no-repeat
+        top 26px
+        z-index 2
+
+    .input-box
+      position absolute
+      width 321px
+      height 37.5px
+      bottom 90px
+      left 27px
+      border 1px solid #000
+      box-sizing border-box
+      .placeholder
+        width 321px
+        height 37.5px
+        background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/placeholder3.png') no-repeat
+        background-size 321px 37.5px
+        box-sizing border-box
+        .left-line
+          width 1Px
+          height 23px
+          background #000000
+          position absolute
+          top 6.5px
+          left 7px
+          box-sizing border-box
+          animation s .5s ease infinite
+      .input
+        width 281.5px
+        height 35.5px
+        border none 
+        outline 0
+        position absolute
+        top 0
+        color #ff4b30
+        background 0 0
+        padding 8.5px 6.5px
+        font-size 15px
+        line-height 35.5px
+        box-sizing border-box
+      .right-line
+        width 1px
+        height 35.5px
+        background #000000
+        position absolute
+        top 0
+        right 37px
+      .ok
+        display none
+        position absolute
+        width 37.5px
+        height 35.5px
+        background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/ok1.png') no-repeat
+        background-position center center
+        right 0
+        top 0
+    .next
+      width 72.5px
+      height 24px
+      background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/next1.png') no-repeat
+      position absolute
+      bottom 41px
+      right 27px
+          
+
+@keyframes s
+  0%
+    opacity 1
+  50%
+    opacity 0

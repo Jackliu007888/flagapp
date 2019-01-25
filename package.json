@@ -11,8 +11,11 @@
     "dayjs": "^1.7.8",
     "fastclick": "^1.0.6",
     "howler": "^2.1.0",
+    "html2canvas": "^1.0.0-alpha.12",
+    "konva": "^2.6.0",
     "normalize.css": "^8.0.1",
     "vue": "^2.5.17",
+    "vue-konva": "^2.0.0",
     "vue-router": "^3.0.2",
     "vuex": "^3.0.1"
   },
@@ -23,6 +26,9 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^5.8.0",
     "eslint-plugin-vue": "^5.0.0-0",
+    "postcss-import": "^12.0.1",
+    "postcss-pxtorem": "^4.0.1",
+    "postcss-url": "^8.0.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "vue-template-compiler": "^2.5.17"
@@ -84,7 +90,20 @@
   },
   "postcss": {
     "plugins": {
-      "autoprefixer": {}
+      "autoprefixer": {},
+      "postcss-pxtorem": {
+        "rootValue": 20,
+        "unitPrecision": 5,
+        "propList": [
+          "!border",
+          "!border-*",
+          "*"
+        ],
+        "selectorBlackList": [],
+        "replace": true,
+        "mediaQuery": false,
+        "minPixelValue": 0
+      }
     }
   },
   "browserslist": [

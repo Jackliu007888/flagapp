@@ -3,6 +3,9 @@ import App from './app.js'
 import VueRouter from 'vue-router'
 import FastClick from 'fastclick'
 import httpPlugin from './plugins/request/index'
+import VueKonva from 'vue-konva'
+
+Vue.use(VueKonva)
 
 import 'normalize.css'
 import '@/common/style/index.styl'

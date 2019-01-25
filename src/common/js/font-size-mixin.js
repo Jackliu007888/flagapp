@@ -1,15 +1,16 @@
-const [BASE_FONT_SIZE, BASE_SCREEN_WIDTH] = [20, 375]
+const  BASE_SCREEN_WIDTH = 375
 
 export default {
-  created () {
+  created() {
     this.windowResizeHandler()
-    window.addEventListener('resize', this.windowResizeHandler)
+    // window.addEventListener('resize', this.windowResizeHandler)
   },
   methods: {
     windowResizeHandler() {
       const clientWidth = window.document.body.clientWidth
-      const fs = (BASE_FONT_SIZE * clientWidth) / BASE_SCREEN_WIDTH + 'px'
-      window.document.getElementsByTagName('html')[0].style.fontSize = fs
+      const scale = BASE_SCREEN_WIDTH / clientWidth
+      const viewport = document.querySelector(`meta[name='viewport']`)
+      viewport.content = `width=${BASE_SCREEN_WIDTH},initial-scale=${scale},maximum-scale=${scale},minimum-scale=${scale}`
     }
   }
 }
