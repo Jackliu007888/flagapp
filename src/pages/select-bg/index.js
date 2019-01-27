@@ -2,10 +2,12 @@ import style from './index.module.styl'
 import { COLOR_LIST, IMAGE_LIST } from './enum.js'
 import SaveCanvas from '@/pages/save-canvas'
 import FlagList from '@/components/flag-list'
+import dayjs from 'dayjs'
 
-const RULER_RANGE = [45.5, 318]
+const RULER_RANGE = [90, 636]
 const CHOOSER = ['color', 'image']
 export default {
+  props: ['visible', 'selectedFlagList'],
   components: {
     SaveCanvas,
     FlagList
@@ -15,7 +17,7 @@ export default {
       showSaveCanvas: false,
       currentChooser: CHOOSER[0],
       currentImage: IMAGE_LIST[0],
-      ruleX: 202.5,
+      ruleX: 405,
       step3Flash: false,
       isStep3Fade: false,
       isStep3: false,
@@ -24,27 +26,7 @@ export default {
       rulerChanged: false,
       chooseMainColor: COLOR_LIST[0].main,
       step3Checked: false,
-      nameInputValue: null,
-      selectedFlagList: [
-        '做个自律的人',
-        '遇到喜欢的人要主动一点遇到喜欢的人要主动一点遇到喜欢的人要主动一点遇到喜欢的人要主动一点遇到喜欢的人要主动一点遇到喜欢的人要主动一点',
-        '学会拒绝和说不',
-        '瘦10斤',
-        '多认识一些新朋友',
-        '告别丧丧的自己',
-        '做个自律的人',
-        '遇到喜欢的人要主动一点',
-        '学会拒绝和说不',
-        '瘦10斤',
-        '多认识一些新朋友',
-        '告别丧丧的自己',
-        '做个自律的人',
-        '遇到喜欢的人要主动一点',
-        '学会拒绝和说不',
-        '瘦10斤',
-        '多认识一些新朋友',
-        '告别丧丧的自己',
-      ],
+      nameInputValue: null
     }
   },
   mounted() {
@@ -56,23 +38,34 @@ export default {
       return item ? item.splits : []
     },
     currentSplitColor() {
-      const splitWidth = 39
-      const rulerWidth = 11
-      const baseX = 31.5
+      const splitWidth = 78
+      const rulerWidth = 22
+      const baseX = 63
       const index = parseInt((this.ruleX - baseX + (rulerWidth / 2)) / splitWidth)
       return this.splitsColor[index]
     }
   },
   methods: {
+    handleClickConfirm() {
+      if (!this.nameInputValue) {
+        return alert('请输入名字！')
+      }
+      this.showSaveCanvas = true
+    },
     handleChangeMainColor(e) {
       const { mainColor } = e.currentTarget.dataset
       this.chooseMainColor = mainColor
     },
     handleMoveRuler(e) {
+      if(!this.ruleStartX) return false
       const [min, max] = RULER_RANGE
       this.ruleX = Math.max(Math.min(e.targetTouches[0].clientX - this.ruleStartX, max), min)
     },
+    handleRulerTouchEnd() {
+      this.ruleStartX = null
+    },
     handleRulerTouchStart(e) {
+      this.rulerChanged = true
       this.ruleStartX = e.targetTouches[0].clientX - this.ruleX
     },
     handleClickSplit(e) {
@@ -100,7 +93,7 @@ export default {
       }, 600)
     },
     handleClickStep3Check() {
-      this.step3Checked = !this.step3Checked
+      this.step3Checked = true
       this.step3Flash = false
     },
     handleClickNameBox() {
@@ -119,6 +112,11 @@ export default {
       this.$refs.namePlaceholder.style.display = 'none'
     },
     handleInputBlur() {
+      setTimeout(() => {
+        const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0
+        window.scrollTo(0, Math.max(scrollHeight - 1, 0))
+      }, 100)
+
       if (!this.nameInputValue) {
         this.$refs.namePlaceholder.style.display = 'block'
       }
@@ -128,7 +126,8 @@ export default {
     }
   },
   render(h) {
-    const px2rem = (value, rootValue = 20, unitPrecision = 5) => (value / rootValue).toFixed(unitPrecision)
+    if(!this.visible) return null
+    // const px2rem = (value, rootValue = 20, unitPrecision = 5) => (value / rootValue).toFixed(unitPrecision)
 
     const settingsStyle = {
       backgroundColor: this.currentSplitColor,
@@ -174,7 +173,7 @@ export default {
                 class={style['name']} />
               <div class={style['name-mask']}></div>
             </div>
-            <div onClick={() => { this.showSaveCanvas = true }} class={style['confirm']}></div>
+            <div onClick={this.handleClickConfirm} class={style['confirm']}></div>
           </div>
           <div
             ref="step2"
@@ -227,7 +226,8 @@ export default {
                 <div
                   onTouchstart={this.handleRulerTouchStart}
                   onTouchmove={this.handleMoveRuler}
-                  style={`left: ${px2rem(this.ruleX)}rem`}
+                  onTouchend={this.handleRulerTouchEnd}
+                  style={`left: ${(this.ruleX)}px`}
                   class={{
                     [style['ruler']]: true,
                     [style['ruler-ani']]: !this.rulerChanged,
@@ -273,10 +273,11 @@ export default {
               backgroundColor={this.chooseMainColor}
               selectedFlagList={this.selectedFlagList}
               signName={this.nameInputValue}
-              signTime={'2019/1/22 23:16'}
+              signTime={dayjs().format('YYYY-MM-DD HH:mm')}
               image={this.currentImage}
               qrcode={this.currentImage}
               visible={true}
+              onSaveImageSuccess={(val) => this.$emit('saveImageSuccess', val)}
             />
           )
         }

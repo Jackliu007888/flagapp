@@ -2,6 +2,9 @@ import style from './index.module.styl'
 import FlagList from '@/components/flag-list'
 import html2canvas from 'html2canvas'
 
+const canvasHeight = window.document.body.offsetHeight
+
+
 export default {
   components: {
     FlagList
@@ -13,19 +16,38 @@ export default {
     'signName',
     'signTime',
     'image',
-    'qrcode'
   ],
   data() {
     return {
-      saveCanvasImage: null
+      saveCanvasImage: null,
+      qrcodeImage: null
     }
   },
-  mounted() {
-    const height = Math.max(this.$refs.textBox.offsetHeight, 240)
-    this.$refs.endSave.style.height = height + 840 + 'px' 
-    this.$refs.endMain.style.height = height + 720 + 'px'
+  async mounted() {
+    const height =this.$refs.textBox.offsetHeight
+    this.$refs.endSave.style.height =  Math.max(height + 840, canvasHeight) + 'px' 
+    this.$refs.endMain.style.height = Math.max(height + 720, canvasHeight -120) + 'px'
 
+    const generateQRCodeImageURL = async link => {
+      const QRCode = (await import('qrcodejs')).default
+      const imgURL = await new Promise(resolve => {
+        const div = document.createElement('div')
+
+        new QRCode(div, {
+          text: link,
+          width: 400,
+          height: 400
+        })
+
+        div.firstElementChild.toBlob(blob => {
+          resolve(window.URL.createObjectURL(blob))
+        })
+      })
+      return imgURL
+    }
     
+    this.qrcodeImage = await generateQRCodeImageURL(window.location.origin + window.location.pathname)
+
     this.$nextTick(() => {
 
       let shareContent = this.$refs.endSave //需要截图的包裹的（原生的）DOM 对象
@@ -40,7 +62,7 @@ export default {
       let opts = {
         scale: scale, // 添加的scale 参数
         canvas: canvas, //自定义 canvas
-        logging: true, //日志开关，便于查看html2canvas的内部执行流程
+        logging: false, //日志开关，便于查看html2canvas的内部执行流程
         width: width, //dom 原始宽度
         height: height,
         useCORS: true // 【重要】开启跨域配置
@@ -55,22 +77,21 @@ export default {
         context.webkitImageSmoothingEnabled = false
         context.msImageSmoothingEnabled = false
         context.imageSmoothingEnabled = false
-        this.saveCanvasImage = canvas.toDataURL('image/png')
-
+        this.$emit('saveImageSuccess', canvas.toDataURL('image/png'))
         // const a = document.createElement('a')
         // a.download = `${name}.png`
-
         // a.href = canvas.toDataURL('image/png')
         // a.click()
+
       })
     })
   },
   render(h) {
     if (!this.visible) return null
-    const canvasHeight = window.document.body.offsetHeight
+    
 
     return (
-      <div style={`height: ${canvasHeight}px`} class={style['save-canvas']}>
+      <div style={`height: ${canvasHeight}px`} class={style['save-canvas']} >
         <div ref="endSave" style={`background-color: ${this.backgroundColor};`} class={style['end-save']}>
           <div ref="endMain" class={style['end-main']}>
             <div class={style['end-bg']}>
@@ -86,18 +107,17 @@ export default {
               <flag-list selectedFlagList={this.selectedFlagList} />
             </div>
             <div class={style['end-bottom']}>
-              <div class={style['sign-name']}>{this.signName || 'adadad'}</div>
+              <div class={style['sign-name']}>{this.signName}</div>
               <div class={style['sign-time-box']}>
                 <div class={style['sign-time']}>立于{this.signTime}</div>
                 <div class={style['flag']}></div>
               </div>
               <div class={style['qrcode-scan']}>
-                <img src={this.qrcode} alt=""/>
+                <img src={this.qrcodeImage} alt=""/>
               </div>
             </div>
           </div>
         </div>
-        <img class={style['save-image']} src={this.saveCanvasImage} />
       </div>
     )
   }

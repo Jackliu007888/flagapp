@@ -29,7 +29,7 @@
         height 425px
         border 0.5px solid #101010
         position absolute
-        top 90px
+        top 40px
         left 27px
         box-sizing border-box
         transform-origin 0 0
@@ -52,7 +52,7 @@
         .fold-intro
           width 150px
           height 16px
-          background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/fold_intro.png') no-repeat
+          // background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/fold_intro.png') no-repeat
           position absolute
           top 11px
           left 146px
@@ -68,6 +68,8 @@
           .fold-main-box
             width 100%
             overflow-y scroll
+            height 350px
+            
           .fold-main
             margin 0
             padding 0
@@ -75,6 +77,7 @@
             height 87px
             top 0
             position relative
+            height 350px
             li
               transition all linear .2s
               font-size 16px
@@ -114,8 +117,14 @@
       height 42px
       background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/top_bg2.png') no-repeat
       position absolute
-      top 69.5px
+      top 20px
       left 27px
+      &.animate
+        .s-top-tips
+          display block
+        .s-top-tips-text, .top-select-text
+          animation s 1s ease infinite
+
       .top-num
         font-size 15px
         line-height 15px
@@ -142,7 +151,7 @@
         .s-top-tips-text
           width 130px
           height 16px
-          background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/tips_text.png') np-repeat
+          background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/tips_text.png') no-repeat
           position absolute
           top 9px
           left 13px
@@ -156,7 +165,7 @@
     .box
       position absolute
       width 100%
-      top 184px
+      top 144px
       left 42.5px
       margin 0
       padding 0
@@ -166,6 +175,10 @@
         width 130px
         position absolute
         -webkit-perspective 1000
+        &.chosen
+          .num
+            background-image url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/chosen.png')
+            font-size 0
         .num
           font-size 15px
           color #000000
@@ -247,6 +260,7 @@
         background-color #ff4b30
         position absolute
         top 0
+        transition all 0.5s ease
       .change-text
         position absolute
         width 67.5px
@@ -254,7 +268,7 @@
         background url('http://static.ws.126.net/163/f2e/news/happynewyear2019/img/select/change_text1.png') no-repeat
         top 26px
         z-index 2
-
+        
     .input-box
       position absolute
       width 321px

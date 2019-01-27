@@ -6,13 +6,15 @@ import style from './index.module.styl'
 
 import FLAGS from './flags'
 import SENSITIVE from './sensitive'
-
-const scale = 1
+import UUID from 'uuid'
 
 export default {
   props: ['makeFlagImageList', 'visible'],
   data() {
     return {
+      angle: 0,
+      isBtnLocked: false,
+      startAnimBg: false,
       inputContent: '',
       flagFoldSwithStatus: false,
       indexStatus: false,
@@ -112,7 +114,12 @@ export default {
   },
   watch: {
     visible(val) {
-      val && this.start()
+      if (val) {
+        this.start()
+      } else {
+        this.anim.stop()
+        this.btnAnim.stop()
+      }
     },
     flagFoldSwithStatus(val) {
       if (val) {
@@ -129,24 +136,99 @@ export default {
     }
   },
   methods: {
-    async start() {
-      const makeFlagBgList = this.makeFlagImageList.filter(d => d.screen === 'makeFlag' && d.name.includes('a_000')).map(d => d.instance)
-      let i = 0
-      const animateBg = (i) => {
-        const image = makeFlagBgList[i++ % len]
-        Object.assign(this.snowConfig, { image })
-        setTimeout(() => {
-          animateBg(i)
-        }, 100)
+    async startAnimaition([x, y]) {
+
+      class Star {
+        constructor({pos: [x, y] , target: [targetX, targetY] = [40, 40], size: size = 40, onRuning: onRuning = () => {}}) {
+          this.x = x
+          this.y = y
+          this.targetX = targetX
+          this.targetY = targetY
+
+          this.star = document.createElement('div')
+          this.star.id = UUID()
+          document.body.appendChild(this.star)
+          this.star.innerText = '🌟'
+          this.star.style.position = 'absolute'
+          this.star.style.fontSize = size + 'px'
+
+          this.onRuning = onRuning
+
+          this.animation()
+        }
+
+        animation() {
+          let i = 0
+          const diff = 10
+          this.onRuning(true)
+          
+          const anim = () => {
+            if (Math.abs(this.targetX - this.x) < diff && Math.abs(this.targetY - this.y) < diff) {
+              this.star.style.opacity = 0
+              document.body.removeChild(this.star)
+              this.star = null
+
+              this.onRuning && this.onRuning(false)
+              return false
+            }
+            this.x += (this.targetX - this.x) / 400 * i
+            this.y += (this.targetY - this.y) / 200 * i
+
+            this.star.style.left = this.x + 'px'
+            this.star.style.top = this.y + 'px'
+          
+            i++
+            window.requestAnimationFrame(anim)
+          }
+          window.requestAnimationFrame(anim)
+        }
       }
 
+      const star = new Star({
+        pos: [x, y],
+        target: [40, 40],
+        size: 40,
+        onRuning: bool => {
+          if (bool) {
+            let i = 3
+            const newRandomStar = () => new Star({ pos: [star.x, star.y], target: [star.x + (Math.random() * 50 - 10), star.y + (Math.random() * 20 + 20)], size: Math.random() > 0.5 ? 30 : 15 })
+            
+            this.intervalTimer = setInterval(() => {
+              i && new Array(i--).fill().forEach(() => newRandomStar())
+            }, 200)
+          } else {
+            clearInterval(this.intervalTimer)
+            this.intervalTimer = null
+          }
+        }
+      })
+    },
+    async start() {
+      const makeFlagBgList = this.makeFlagImageList.filter(d => d.screen === 'makeFlag' && d.name.includes('snow/a_000')).map(d => d.instance)
       let len = makeFlagBgList.length
-      animateBg(i)
 
+      const groundImageList = this.makeFlagImageList.filter(d => d.screen === 'makeFlag' && d.name.includes('ground_grow/a_00')).map(d => d.instance)
+
+
+      let i = 0
+      const animateBg = () => {
+        const image = makeFlagBgList[parseInt(i % len)]
+        Object.assign(this.snowConfig, { image })
+       
+        if (this.startAnimBg) {
+          Object.assign(this.groundConfig, {
+            image: groundImageList[parseInt(i % groundImageList.length)]
+          })
+        }
+
+        window.requestAnimationFrame(animateBg)
+        i += 0.25
+      }
+
+      window.requestAnimationFrame(animateBg)
 
       const flagBgImage = this.makeFlagImageList.find(d => d.name === 'flagBgImage')
       const peopleImage = this.makeFlagImageList.find(d => d.name === 'peopleImage')
-      const groundImage = this.makeFlagImageList.find(d => d.name === 'groundImage')
 
       Object.assign(this.flagBgConfig, {
         image: flagBgImage.instance
@@ -154,9 +236,12 @@ export default {
       Object.assign(this.peopleConfig, {
         image: peopleImage.instance
       })
-      Object.assign(this.groundConfig, {
-        image: groundImage.instance
-      })
+      if (!this.startAnimBg) {
+        Object.assign(this.groundConfig, {
+          image: groundImageList[0]
+        })
+      }
+     
 
       const loadImage = src => {
         return new Promise(resolve => {
@@ -188,23 +273,25 @@ export default {
         const amplitude = 12
         const period = 3000 // in ms
         const centerY = this.$refs.triangle.getStage().getY()
-        const anim = new Konva.Animation(frame => {
+        this.anim = new Konva.Animation(frame => {
           const t = frame.time % (period / 4)
           this.$refs.triangle.getStage().setY(amplitude * Math.sin(t * 2 * Math.PI / period) + centerY)
           this.$refs.triangle.getStage().setOpacity(1 * Math.cos(t * 2 * Math.PI / period))
         }, this.$refs.layer.getStage())
 
-        anim.start()
+        this.anim.start()
       })
     },
     setBtnAnimation() {
+      if (this.isBtnLocked) return false
+      this.isBtnLocked = true
       const amplitude = 74
       const period = 500 // in ms
       const btnX = this.$refs.btn.getStage().getX()
       const innerBtnWidth = this.$refs.innerBtn.getStage().getWidth()
-      const anim = new Konva.Animation(frame => {
+      this.btnAnim = new Konva.Animation(frame => {
         const diff = amplitude * (frame.time / period)
-        if (diff + innerBtnWidth <= 165) {
+        if (diff + innerBtnWidth <= 310) {
           this.$refs.group.getStage().setClip({
             x: diff + btnX + 6,
           })
@@ -217,16 +304,17 @@ export default {
         }
       }, this.$refs.layer.getStage())
 
-      anim.start()
+      this.btnAnim.start()
       this.$refs.triangle.getStage().hide()
       this.$refs.flag.getStage().hide()
       this.$refs.people.getStage().hide()
 
+      this.startAnimBg = true
+
       setTimeout(() => {
         this.showText = true
         this.animationFlagText()
-
-      }, 1000)
+      }, 2000)
     },
     animationFlagText() {
 
@@ -237,7 +325,7 @@ export default {
         const diffY = parseInt(row / 7) * 18
         return {
           x: baseX + diffX + 42.5,
-          y: baseY + diffY + 202
+          y: baseY + diffY + 160
         }
       }
   
@@ -320,7 +408,7 @@ export default {
       this.resultText = getResultText()
   
       this.timer = setInterval(() => {
-        const checkD = (unitPrecision = 3) => this.resultText.some(({x, y, rx, ry}) => {
+        const checkD = (unitPrecision = 5) => this.resultText.some(({x, y, rx, ry}) => {
           if (Math.abs(x - rx) > unitPrecision || Math.abs(y - ry) > unitPrecision) {
             return false
           }
@@ -341,12 +429,15 @@ export default {
         })
       }, 100)
     },
-    handleConfirmInput() {
+    handleConfirmInput(e) {
+      if (!this.inputContent) return false
+      
       if (SENSITIVE.includes(this.inputContent)) {
         alert('咦～您输入的个别字符不太对劲，请重新输入')
         this.inputContent = ''
         return false
       }
+      this.startAnimaition([e.clientX, e.clientY])
       this.selectedFlagList.push(this.inputContent)
       this.inputContent = ''
     },
@@ -354,6 +445,7 @@ export default {
       this.inputContent = e.currentTarget.value
     },
     handleClickFlag(e) {
+      this.startAnimaition([e.clientX, e.clientY])
       const { text } = e.currentTarget.dataset
       this.selectedFlagList.push(text)
     },
@@ -363,9 +455,18 @@ export default {
       this.$refs.ok.style.display = 'block'
     },
     handleInputBlur() {
-      this.$refs.placeholder.style.display = 'block'
+      setTimeout(() => {
+        const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0
+        window.scrollTo(0, Math.max(scrollHeight - 1, 0))
+      }, 100)
+
       this.$refs.next.style.display = 'block'
-      this.$refs.ok.style.display = 'none'
+
+      if (!this.inputContent) {
+        this.$refs.placeholder.style.display = 'block'
+        this.$refs.ok.style.display = 'none'
+      }
+      
     },
     handleOpenFold(e) {
       e.stopPropagation()
@@ -381,6 +482,7 @@ export default {
       this.selectedFlagList.splice(index, 1)
     },
     handleChangeFlag() {
+      if(!this.animetionTextOver) return false
       const shuffle = arr => {
         let n = arr.length, random
         while(0 !== n){
@@ -389,20 +491,33 @@ export default {
         }
         return arr
       }
+
+      const rotate = () => {
+        this.angle+=180
+        this.$refs['rotate-btn'].style.transform = `rotate(${this.angle}deg)`
+      }
       
+      
+      rotate()
       this.flagTextList = new Array(6).fill(0).map((item, index) => shuffle(FLAGS)[index])
+    },
+    handleClickNext() {
+      if(!this.animetionTextOver) return false
+      if (!this.selectedFlagListLength) {
+        return alert('立下你的 flag 吧！')
+      }
+      setTimeout(() => {
+        this.$emit('next', this.selectedFlagList)
+      }, 300)
     }
   },
-  mounted() {
-    
-  },
   render(h) {
+    if(!this.visible) return false
 
     const px2rem = (value, rootValue = 20, unitPrecision = 5) => (value / rootValue).toFixed(unitPrecision)
     const configKonva =  {
       width: window.innerWidth,
-      height: window.innerHeight,
-      scale: { x: scale, y: scale }
+      height: window.innerHeight
     }
     const bgConfig = {
       x: 0,
@@ -454,7 +569,7 @@ export default {
                   <div class={style['fold-main-padding-box']}>
                     <div class={style['fold-main-box']}>
                       <ul class={style['fold-main']} style={{
-                        height: this.selectedFlagListLength * px2rem(43.5) + 'rem',
+                        // height: this.selectedFlagListLength * px2rem(43.5) + 'rem',
                         top: 0
                       }}>
                         {
@@ -473,7 +588,12 @@ export default {
                   </div>
                 </div>
               </div>
-              <div class={style['s-top']}>
+              <div
+                class={{
+                  [style['s-top']]: true,
+                  [style['animate']]: this.selectedFlagList.length > 0
+                }}
+              >
                 <div class={style['top-num']}>{this.selectedFlagListLength}</div>
                 <div class={style['top-select-text']}>
                 </div>
@@ -486,7 +606,13 @@ export default {
               <ul class={style['box']}>
                 {
                   this.flagTextList.map((item, index) => (
-                    <li key={item + index} class={style['s-li']}>
+                    <li
+                      key={item + index}
+                      class={{
+                        [style['s-li']]: true,
+                        [style['chosen']]: this.selectedFlagList.includes(item)
+                      }}
+                    >
                       <div class={style['num']}>{index + 1}</div>
                       <div class={style['text']}>
                         {
@@ -505,7 +631,9 @@ export default {
               </div>
               <div onClick={this.handleChangeFlag} class={style['change']}>
                 <div class={style['change-bg']}></div>
-                <div class={style['change-rotate']}></div>
+                <div
+                  ref="rotate-btn"
+                  class={style['change-rotate']}></div>
                 <div class={style['change-text']}></div>
               </div>
               <div class={style['input-box']}>
@@ -516,7 +644,7 @@ export default {
                 <div class={style['right-line']}></div>
                 <div ref="ok" onClick={this.handleConfirmInput} class={style['ok']}></div>
               </div>
-              <div ref="next" class={style['next']}></div>
+              <div ref="next" onClick={this.handleClickNext} class={style['next']}></div>
             </div>
           )
         }

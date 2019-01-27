@@ -1,17 +1,12 @@
 import VueRouter from 'vue-router'
 
 const router = new VueRouter({
-  mode: 'hash',
+  mode: 'history',
   routes: [
     {
       path: '/',
       name: 'home',
-      component: () => import ('@/pages/home')
-    },
-    {
-      path: '/loading',
-      name: 'loading',
-      component: () => import ('@/pages/loading')
+      component: () => import ('@/pages/main')
     },
     {
       path: '/demo-01',

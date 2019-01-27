@@ -8,12 +8,13 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "dayjs": "^1.7.8",
+    "dayjs": "^1.8.0",
     "fastclick": "^1.0.6",
     "howler": "^2.1.0",
     "html2canvas": "^1.0.0-alpha.12",
     "konva": "^2.6.0",
     "normalize.css": "^8.0.1",
+    "qrcodejs": "github:shenhudong/qrcodejs#23351508c97c043ac72839dd810ab58eff3e9fe9",
     "vue": "^2.5.17",
     "vue-konva": "^2.0.0",
     "vue-router": "^3.0.2",
