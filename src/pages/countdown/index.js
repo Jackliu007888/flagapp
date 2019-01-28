@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     /**
-     * 0 - Math.PI
+     * 0 - Math.PI * 2
      */
     angle() {
       // 第一象限
@@ -150,7 +150,7 @@ export default {
       /**
        * 两点确定一条直线
        * y = kx + b
-       * 根据两点确定 k, b
+       * 根据两点确定 k, b = 0
        * 圆心向外指向
        */
       const getLine = ([x1, y1], [x2, y2] = [0, 0]) => {
@@ -186,9 +186,8 @@ export default {
     },
     handleTouchstart(e) {
       const { clientX, clientY } = e.touches[0]
-      console.log(clientX, clientY)
       
-      if (isInRange(clientX, 341) && isInRange(clientY, 368)) {
+      if (isInRange(clientX, CICLE_DOT_TOP_POSTION[0]) && isInRange(clientY, CICLE_DOT_TOP_POSTION[1])) {
         this.hitStartPostion = [clientX, clientY]
       } else {
         this.hitStartPostion = []

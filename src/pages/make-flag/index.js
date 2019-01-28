@@ -10,6 +10,45 @@ import UUID from 'uuid'
 
 export default {
   props: ['makeFlagImageList', 'visible'],
+  triangleConfig: null,
+  goConfig: null,
+  goClickConfig: null,
+  flagBgConfig: null,
+  peopleConfig: null,
+  configKonva: {
+    width: window.innerWidth,
+    height: window.innerHeight
+  },
+  bgConfig:{
+    x: 0,
+    y: 0,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    fill: '#ececec'
+  },
+  btnConfig: {
+    width: 330,
+    height: 96,
+    x: 210,
+    y: 914,
+    stroke: '#ed593f',
+    strokeWidth: 2
+  },
+  innerBtnConfig: {
+    width: 12,
+    height: 96,
+    x: 210,
+    y: 914,
+    fill: '#ed593f',
+  },
+  groupConfig: {
+    clip: {
+      width: 330,
+      height: 96,
+      x: 210,
+      y: 914,
+    }
+  },
   data() {
     return {
       angle: 0,
@@ -38,76 +77,12 @@ export default {
         heigh: window.innerHeight,
         image: {}
       },
-      flagBgConfig: {
-        width: 650,
-        height: 672,
-        x: window.innerWidth - 650,
-        y: 120,
-        image: {}
-      },
-      peopleConfig: {
-        width: 352,
-        height: 344,
-        x: window.innerWidth - 352,
-        y: window.innerHeight - 344,
-        image: {}
-      },
       groundConfig: {
         width: window.innerWidth,
         height: 400,
         x: 0,
         y: window.innerHeight - 400,
         image: {}
-      },
-      btnConfig: {
-        width: 330,
-        height: 96,
-        x: 210,
-        y: 914,
-        stroke: '#ed593f',
-        strokeWidth: 2
-      },
-      innerBtnConfig: {
-        width: 12,
-        height: 96,
-        x: 210,
-        y: 914,
-        fill: '#ed593f',
-      },
-      triangleConfig: {
-        width: 24,
-        height: 12,
-        x: 375,
-        y: 860,
-        image: {}
-      },
-      goConfig: {
-        width: 148,
-        height: 39,
-        x: 306,
-        y: 940 ,
-        image: {},
-        clip: {
-          width: 148,
-          height: 39,
-          x: 306,
-          y: 940,
-        }
-      },
-      goClickConfig: {
-        width: 148,
-        height: 39,
-        x: 306,
-        y: 940 ,
-        image: {}
-      },
-      groupConfig: {
-        clip: {
-          width: 330,
-          height: 96,
-          x: 210,
-          y: 914,
-        }
       },
       show: false
     }
@@ -209,7 +184,6 @@ export default {
 
       const groundImageList = this.makeFlagImageList.filter(d => d.screen === 'makeFlag' && d.name.includes('ground_grow/a_00')).map(d => d.instance)
 
-
       let i = 0
       const animateBg = () => {
         const image = makeFlagBgList[parseInt(i % len)]
@@ -227,15 +201,27 @@ export default {
 
       window.requestAnimationFrame(animateBg)
 
+      // ios bug
+      Object.assign(this.snowConfig, {
+        image:makeFlagBgList[0]
+      })
       const flagBgImage = this.makeFlagImageList.find(d => d.name === 'flagBgImage')
       const peopleImage = this.makeFlagImageList.find(d => d.name === 'peopleImage')
 
-      Object.assign(this.flagBgConfig, {
+      this.$options.flagBgConfig = {
+        width: 650,
+        height: 672,
+        x: window.innerWidth - 650,
+        y: 120,
         image: flagBgImage.instance
-      })
-      Object.assign(this.peopleConfig, {
-        image: peopleImage.instance
-      })
+      }
+      this.$options.peopleConfig, {
+        image: peopleImage.instance,
+        width: 352,
+        height: 344,
+        x: window.innerWidth - 352,
+        y: window.innerHeight - 344,
+      }
       if (!this.startAnimBg) {
         Object.assign(this.groundConfig, {
           image: groundImageList[0]
@@ -244,29 +230,47 @@ export default {
      
 
       const loadImage = src => {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
           const image = new Image()
-          image.onload = () => {
-            resolve(image)
-          }
+          image.onload = () => { resolve(image) }
+          image.onerror = e => { reject(e) }
           image.src = src
         })
       }
 
-      const loadImageList = await Promise.all([
+      let loadImageList = []
+      loadImageList = await Promise.all([
         loadImage(triangleImg),
         loadImage(goImg),
         loadImage(goClickImg),
       ])
-      Object.assign(this.triangleConfig, {
+      this.$options.triangleConfig = {
+        width: 24,
+        height: 12,
+        x: 375,
+        y: 860,
         image: loadImageList[0]
-      })
-      Object.assign(this.goConfig, {
+      }
+      this.$options.goConfig = {
+        width: 148,
+        height: 39,
+        x: 306,
+        y: 940 ,
+        clip: {
+          width: 148,
+          height: 39,
+          x: 306,
+          y: 940,
+        },
         image: loadImageList[1]
-      })
-      Object.assign(this.goClickConfig, {
+      }
+      this.$options.goClickConfig = {
+        width: 148,
+        height: 39,
+        x: 306,
+        y: 940 ,
         image: loadImageList[2]
-      })
+      }
       this.loadOver = true
 
       this.$nextTick(() => {
@@ -275,10 +279,11 @@ export default {
         const centerY = this.$refs.triangle.getStage().getY()
         this.anim = new Konva.Animation(frame => {
           const t = frame.time % (period / 4)
+
           this.$refs.triangle.getStage().setY(amplitude * Math.sin(t * 2 * Math.PI / period) + centerY)
           this.$refs.triangle.getStage().setOpacity(1 * Math.cos(t * 2 * Math.PI / period))
         }, this.$refs.layer.getStage())
-
+  
         this.anim.start()
       })
     },
@@ -512,43 +517,28 @@ export default {
     }
   },
   render(h) {
-    if(!this.visible) return false
+    if(!this.visible) return null
+    if(!this.loadOver) return null
 
     const px2rem = (value, rootValue = 20, unitPrecision = 5) => (value / rootValue).toFixed(unitPrecision)
-    const configKonva =  {
-      width: window.innerWidth,
-      height: window.innerHeight
-    }
-    const bgConfig = {
-      x: 0,
-      y: 0,
-      width: window.innerWidth,
-      height: window.innerHeight,
-      fill: '#ececec'
-    }
-    
     return (
       <div class={style['main']}>
-        {
-          this.loadOver && (
-            <v-stage ref="stage" config={configKonva}>
-              <v-layer ref="layer">
-                <v-rect config={bgConfig} />
-                <v-image ref="flag" config={this.flagBgConfig} />
-                <v-image config={this.groundConfig} />
-                <v-image ref="people" config={this.peopleConfig} />
-                <v-image config={this.snowConfig}/>
-                <v-image ref="triangle" config={this.triangleConfig} />
-                <v-rect ref="btn" onTap={this.setBtnAnimation} onClick={this.setBtnAnimation} config={this.btnConfig} />
-                <v-rect ref="innerBtn"  config={this.innerBtnConfig} />
-                <v-image ref="goClick" config={this.goClickConfig} />
-                <v-group ref="group" onTap={this.setBtnAnimation} onClick={this.setBtnAnimation}  config={this.groupConfig}>
-                  <v-image ref="go" config={this.goConfig} />
-                </v-group>
-              </v-layer>
-            </v-stage>
-          )
-        }
+        <v-stage ref="stage" config={this.$options.configKonva}>
+          <v-layer ref="layer">
+            <v-rect config={this.$options.bgConfig} />
+            <v-image ref="flag" config={this.$options.flagBgConfig} />
+            <v-image config={this.groundConfig} />
+            <v-image ref="people" config={this.$options.peopleConfig} />
+            <v-image config={this.snowConfig}/>
+            <v-image ref="triangle" config={this.$options.triangleConfig} />
+            <v-rect ref="btn" onTap={this.setBtnAnimation} onClick={this.setBtnAnimation} config={this.$options.btnConfig} />
+            <v-rect ref="innerBtn"  config={this.$options.innerBtnConfig} />
+            <v-image ref="goClick" config={this.$options.goClickConfig} />
+            <v-group ref="group" onTap={this.setBtnAnimation} onClick={this.setBtnAnimation}  config={this.$options.groupConfig}>
+              <v-image ref="go" config={this.$options.goConfig} />
+            </v-group>
+          </v-layer>
+        </v-stage>
         {
           this.showText && (
             <div class={style['select-main']}>
