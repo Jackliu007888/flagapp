@@ -10,6 +10,9 @@ import UUID from 'uuid'
 
 export default {
   props: ['makeFlagImageList', 'visible'],
+  components: {
+    draggable: () => import('vuedraggable')
+  },
   triangleConfig: null,
   goConfig: null,
   goClickConfig: null,
@@ -119,6 +122,7 @@ export default {
           this.y = y
           this.targetX = targetX
           this.targetY = targetY
+          this.opacity = 1
 
           this.star = document.createElement('div')
           this.star.id = UUID()
@@ -126,6 +130,7 @@ export default {
           this.star.innerText = '🌟'
           this.star.style.position = 'absolute'
           this.star.style.fontSize = size + 'px'
+          this.star.style.opacity = 1
 
           this.onRuning = onRuning
 
@@ -148,9 +153,12 @@ export default {
             }
             this.x += (this.targetX - this.x) / 400 * i
             this.y += (this.targetY - this.y) / 200 * i
+            this.opacity -= (this.opacity - 0.3) / 200 * i
 
             this.star.style.left = this.x + 'px'
             this.star.style.top = this.y + 'px'
+            this.star.style.opacity = this.opacity
+
           
             i++
             window.requestAnimationFrame(anim)
@@ -454,6 +462,9 @@ export default {
       const { text } = e.currentTarget.dataset
       this.selectedFlagList.push(text)
     },
+    handleChangeElementSort(val) {
+      this.selectedFlagList = val
+    },
     handleInputFocus() {
       this.$refs.placeholder.style.display = 'none'
       this.$refs.next.style.display = 'none'
@@ -562,17 +573,23 @@ export default {
                         // height: this.selectedFlagListLength * px2rem(43.5) + 'rem',
                         top: 0
                       }}>
-                        {
-                          this.selectedFlagList.map((item, index) => (
-                            <li style={{top: px2rem(index * 43.5) + 'rem'}}>
-                              <div class={style['li-index']}>{index + 1}.</div>
-                              <div class={style['li-main']}>
-                                <div class={style['li-text']}>{item}</div>
-                                <div onClick={this.handleDeleteFlag} data-index={index} class={style['li-delete']}></div>
-                              </div>
-                            </li>
-                          ))
-                        }
+                        <draggable
+                          onInput={this.handleChangeElementSort}
+                          value={this.selectedFlagList}
+                          options={{ group: 'people' }} 
+                        >
+                          {
+                            this.selectedFlagList.map((item, index) => (
+                              <li style={{top: px2rem(index * 43.5) + 'rem'}}>
+                                <div class={style['li-index']}>{index + 1}.</div>
+                                <div class={style['li-main']}>
+                                  <div class={style['li-text']}>{item}</div>
+                                  <div onClick={this.handleDeleteFlag} data-index={index} class={style['li-delete']}></div>
+                                </div>
+                              </li>
+                            ))
+                          }
+                        </draggable>
                       </ul>
                     </div>
                   </div>

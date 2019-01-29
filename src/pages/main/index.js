@@ -1,3 +1,5 @@
+import UA from 'ua-device'
+
 import ResLoader from '@/common/js/res-loader'
 
 import style from './index.module.styl'
@@ -76,6 +78,7 @@ export default {
     makeFlagPage,
     selectBgPage
   },
+  qrcodeImage: null,
   makeFlagImageList: [],
   startImageList: [],
   transformImageList: [],
@@ -83,6 +86,7 @@ export default {
   saveCanvasImage: null,
   data() {
     return {
+      isMobile: true,
       resLoaded: false,
       saveCanvasImageVisible: false,
       coundDownPagevisible: false,
@@ -92,7 +96,32 @@ export default {
       total: FONT_LIST.length + IMAGE_LIST.length
     }
   },
-  created() {
+  async created() {
+    const generateQRCodeImageURL = async link => {
+      const QRCode = (await import('qrcodejs')).default
+      const imgURL = await new Promise(resolve => {
+        const div = document.createElement('div')
+
+        new QRCode(div, {
+          text: link,
+          width: 400,
+          height: 400
+        })
+
+        div.firstElementChild.toBlob(blob => {
+          resolve(window.URL.createObjectURL(blob))
+        })
+      })
+      return imgURL
+    }
+    
+    const {device} = new UA(window.navigator.userAgent)
+    if (device.type !== 'mobile') {
+      this.$options.qrcodeImage = await generateQRCodeImageURL(window.location.origin + window.location.pathname)
+      this.isMobile = false
+    }
+    
+
     const that = this
     const resources = [...IMAGE_LIST, ...FONT_LIST]
 
@@ -106,7 +135,7 @@ export default {
         that.complete = total
       },
       onComplete(total, result) {
-        console.log(total, result)
+        // console.log(total, result)
         that.$options.makeFlagImageList = result.filter(d => d.screen === 'makeFlag')
         that.$options.transformImageList = result.filter(d => d.screen === 'transform')
         that.$options.startImageList = result.filter(d => d.screen === 'start')
@@ -133,9 +162,21 @@ export default {
       this.makeFlagPageVisible = false
       this.$options.selectedFlagList = val
       this.selectBgPageVisible = true
-    }
+    },
+
+    
   },
   render(h) {
+    if (!this.isMobile) {
+      return (
+        <div class={style['common-pc']}>
+          <div class={style['common-pc-center']}>
+            <img src={this.$options.qrcodeImage} />
+          </div>
+        </div>
+      )
+    }
+
     // 注意 JS 精度问题
     const percent = parseInt((this.complete / this.total).toFixed(2) * 100)
     const percentTen = parseInt(percent / 10)

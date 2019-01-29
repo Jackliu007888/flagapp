@@ -8,16 +8,20 @@ const isInRange = (p0, p1, range = 70) => {
 const CICLE_CENTER = [341, 586]
 const CICLE_R = 236
 const CICLE_DOT_TOP_POSTION = [CICLE_CENTER[0], CICLE_CENTER[1] - CICLE_R]
+const TRANCE_LEN = 10
 
 const AUDIO_IMAGE = 'https://static.ws.126.net/163/f2e/news/dada2018_newyear/img/first/music.png'
 const TEXT_IMAGE = 'https://static.ws.126.net/163/f2e/news/dada2018_newyear/img/first/bottom_text.png'
 
 export default {
   props: ['startImageList', 'transformImageList', 'visible'],
+  tranceXList: [],
+  tranceYList: [],
   data() {
     return {
       currentTransfromImage: null,
-      hitStartPostion: [],
+      hitStartPostion: null,
+      isRunDot: false,
       hitEndPostion: [],
       cicleDotPostion: CICLE_DOT_TOP_POSTION
     }
@@ -48,9 +52,20 @@ export default {
   },
   watch: {
     angle(val) {
-      if (!val) return (this.currentTransfromImage = null)
+      if (this.$options.tranceXList.length <= TRANCE_LEN) {
+        this.$options.tranceXList.shift()
+      }
+      if (this.$options.tranceYList.length <= TRANCE_LEN) {
+        this.$options.tranceYList.shift()
+      }
 
-      if (val > Math.PI * 5 / 3) {
+      this.$options.tranceXList.push(this.cicleDotPostion[0])
+      this.$options.tranceYList.push(this.cicleDotPostion[1])
+
+      if (!val) return (this.currentTransfromImage = null)
+      if (this.isRunDot) return (this.currentTransfromImage = null)
+
+      if (val > Math.PI * 5 / 3 && val < Math.PI * 23 / 12) {
         this.$emit('next')
       }
       const len = this.transformImageList.length
@@ -100,6 +115,7 @@ export default {
           this.drawStaticText(ctx)
           this.drawAudioImage(ctx, i * 2, audioImage)
           this.drawDate(ctx, i)
+          this.drawRedDotAndText(ctx, i)
           i++
           window.requestAnimationFrame(animation)
           
@@ -114,6 +130,14 @@ export default {
         this.myCanvas.addEventListener('touchend',this.handleTouchend)
       })
 
+    },
+    hitStartPostion(val) {
+      if (!val) {
+        this.runDot()
+        this.isRunDot = true
+      } else {
+        this.isRunDot = false
+      }
     }
   },
   beforeDestroy() {
@@ -122,18 +146,49 @@ export default {
   },
   destroyed() {
   },
+  mounted() {
+    this.runDot()    
+    this.isRunDot = true
+  },
   methods: {
+    runDot() {
+      let angle = 0
+      const anim = () => {
+        angle = (angle + 1) % 90
+        if (angle >= 0 && angle < 90) {
+          this.cicleDotPostion = [Math.sin(angle / 180 * Math.PI) * CICLE_R + CICLE_CENTER[0],CICLE_CENTER[1] - Math.cos(angle / 180 * Math.PI) * CICLE_R]
+        }
+        if (this.isRunDot) {
+          window.requestAnimationFrame(anim)
+        }
+      }
+      window.requestAnimationFrame(anim)
+      
+    },
     bodyScroll(event) {
       event.preventDefault()
     },
     handleTouchend() {
       this.cicleDotPostion = CICLE_DOT_TOP_POSTION
+      this.hitStartPostion = null
     },
     handleTouchmove(e) {
-      if (!this.hitStartPostion.length) return false
-      
+      if (!this.hitStartPostion) return false
+    
       const { clientX, clientY } = e.touches[0]
       // 已圆心为原点，建立直角坐标系
+
+      if (clientX < CICLE_CENTER[0] && clientY < CICLE_DOT_TOP_POSTION[1]) {
+        return this.handleTouchend()
+      }
+
+      if (clientX < CICLE_CENTER[0]) {
+        if (this.$options.tranceXList.reduce((acc, pre) => acc + pre, 0) / this.$options.tranceXList.length > CICLE_CENTER[0]) {
+          if (this.$options.tranceYList.reduce((acc, pre) => acc + pre, 0) / this.$options.tranceYList.length < CICLE_CENTER[1]) { 
+            return this.handleTouchend()
+          }
+        }
+      }
 
       // 坐标转换
       const postionTransfrom = ([x, y]) => {
@@ -146,14 +201,14 @@ export default {
         return [x + x1, y1 - y]
       }
 
-
       /**
        * 两点确定一条直线
        * y = kx + b
        * 根据两点确定 k, b = 0
        * 圆心向外指向
        */
-      const getLine = ([x1, y1], [x2, y2] = [0, 0]) => {
+      const calcLineParams = ([x1, y1], [x2, y2] = [0, 0]) => {
+        if(x1 === x2) throw new Error('x1 === x2 !!')
         const k = (y1 - y2) / (x1 - x2)
         const b = y1 - k * x1
         return {k, b}
@@ -174,7 +229,8 @@ export default {
       }
 
       const [transClientX, transClientY] = postionTransfrom([clientX, clientY])
-      const { k } = getLine([transClientX, transClientY])
+      const { k } = calcLineParams([transClientX, transClientY])
+
       const [x, y] = calcNote({ k, r: CICLE_R })
 
       // 根据实际手势位置判断所在象限
@@ -190,7 +246,7 @@ export default {
       if (isInRange(clientX, CICLE_DOT_TOP_POSTION[0]) && isInRange(clientY, CICLE_DOT_TOP_POSTION[1])) {
         this.hitStartPostion = [clientX, clientY]
       } else {
-        this.hitStartPostion = []
+        this.hitStartPostion = null
       }
     },
     /**
@@ -218,6 +274,46 @@ export default {
       ctx.font = "24px serif"
       ctx.fillStyle = '#000'
       ctx.fillText('请打开声音', 100, window.innerHeight - 100)
+    },
+    drawRedDotAndText(ctx) {
+      function rads(x) {
+        return Math.PI * x / 180
+      }
+      function isNear(startAngle, endAngle, angle) {
+        return startAngle <= angle && endAngle >= angle
+      }
+      const drawCircularText = (s, string, startAngle, endAngle) => {
+        let radius = s.radius,
+          angleDecrement = (startAngle - endAngle) / (string.length - 1),
+          angle = parseFloat(startAngle),
+          index = 0,
+          character
+        ctx.save()
+        ctx.font = '20px text'
+        ctx.textAlign = 'right'
+        ctx.textBaseline = 'middle'
+
+        while(index < string.length) {
+          character = string.charAt(index)
+          ctx.save()
+          ctx.beginPath()
+          ctx.fillStyle = isNear(startAngle + (index + 1) * angleDecrement, startAngle + (index) * angleDecrement, -(this.angle - 0.2)) ? '#ff0000' : 'black'
+          ctx.translate(s.x + Math.sin(angle) * radius,
+            s.y - Math.cos(angle) * radius)
+          ctx.rotate(angle)
+          ctx.fillText(character, 0, 0)
+          angle -= angleDecrement
+          index++
+          ctx.restore()
+        }
+        ctx.restore()
+      }
+      drawCircularText({
+        x: CICLE_CENTER[0],
+        y: CICLE_CENTER[1],
+        radius: CICLE_R - 20,
+      }, '沿虚线滑动，开始立Flag', rads(10), rads(90))
+      
     },
     /**
      * 绘制背景房子
@@ -256,7 +352,6 @@ export default {
       ctx.fillStyle = 'rgba(236, 236, 236, 1)'
       ctx.fillRect(0, 280, 750, 640)
       ctx.drawImage(image, x, y, w, h, 0, 320, 750, 640)
-  
       
     },
     drawDate(ctx) {
@@ -303,9 +398,10 @@ export default {
       ctx.arc(CICLE_CENTER[0] - CICLE_R * Math.sin(Math.PI / 6), (CICLE_CENTER[1] - CICLE_R * Math.cos(Math.PI / 6)), 10, 0, Math.PI * 2, false)
       ctx.stroke()
       
-      // ctx.beginPath()
-      // ctx.arc(CICLE_DOT_TOP_POSTION[0], CICLE_DOT_TOP_POSTION[1], 10, 0, Math.PI * 2, false)
-      // ctx.stroke()
+      ctx.beginPath()
+      ctx.strokeStyle = '#ff0000'
+      ctx.arc(CICLE_DOT_TOP_POSTION[0], CICLE_DOT_TOP_POSTION[1], 10, 0, Math.PI * 2, false)
+      ctx.stroke()
 
       // draw red dot
       ctx.beginPath()
