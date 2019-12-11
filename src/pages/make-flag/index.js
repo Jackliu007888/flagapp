@@ -330,7 +330,12 @@ export default {
       }, 2000)
     },
     animationFlagText() {
-
+      /**
+       * 获取文字上移后的位置
+       * @param {number} level 列
+       * @param {number} row 行
+       * @return {Object} x, y
+       */
       const getAbsPostion = (level, row) => {
         const baseX = level % 2 === 0 ? 0 : 160
         const baseY = parseInt(level / 2) * 86
@@ -342,6 +347,13 @@ export default {
         }
       }
   
+      /**
+       * 简单的碰撞检测
+       * 假设检测物都是矩形，无旋转，每个盒子大小一致
+       * @param {number} x, y 待检测盒子的坐标
+       * @param {array} list 已有盒子的坐标集合
+       * @return {boolean} true 碰撞 false 未碰撞
+       */
       const checkHit = ({ x, y }, list) => {
         const [w, h] = [18, 18]
   
@@ -361,6 +373,10 @@ export default {
           return true
         })
       }
+
+      /**
+       * 获得随机位置
+       */
       const getRandomPos = () => {
         return {
           x: Math.min(Math.random() * 340 + 20, 355), 
@@ -368,6 +384,12 @@ export default {
         }
       }
   
+      /**
+       * 获取长度为 len 的没有碰撞的盒子位置数组
+       * FIXME: while 死循环限制
+       * @params {number} len  需要返回的数组长度
+       * @return {array} 
+       */
       const getList = len => {
         let list = []
         const getPosList = () => {
@@ -378,6 +400,7 @@ export default {
             list.push(pos)
           }
         }
+        // 这里要确保不会发生死循环
         while (list.length < len) {
           getPosList()
         }
@@ -385,6 +408,7 @@ export default {
       }
      
       const getResultText = () => {
+        // 从 flag 数组，获取文字，并把句拆成字
         let result = []
         this.flagTextList.map(d => d.split('')).forEach((item, index) => {
           item.forEach((itm, idx) => {
@@ -393,24 +417,26 @@ export default {
               text: itm,
               level: index,
               row: idx,
-              // x: px2rem(pos.x) + 'rem',
-              // y: px2rem(pos.y) + 'rem'
               x: pos.x,
               y: pos.y
             }) 
           })
         })
+        // 执行上述的 getList 方法，获得为随机文字数组长度的随机位置的组数
         const randomPostionList = getList(result.length)
         randomPostionList.forEach((item, index) => {
           result[index].rx = item.x,
           result[index].ry = item.y
-          // result[index].rx = px2rem(item.x) + 'rem',
-          // result[index].ry = px2rem(item.y) + 'rem'
         })
   
         return result
       }
-  
+      
+      /**
+       * 
+       * @param {*} param0 
+       * @param {*} time 
+       */
       const getDiffPos = ({ x, y, rx, ry }, time) => {
         return {
           x: rx - (rx - x) / time,
@@ -421,6 +447,11 @@ export default {
       this.resultText = getResultText()
   
       this.timer = setInterval(() => {
+        /**
+         * 检测当前文字位置与预设位置的差值是否已小于等于阈值
+         * @param {number} unitPrecision 
+         * @return {boolean} true 已有至少一个文字小于等于阈值
+         */
         const checkD = (unitPrecision = 5) => this.resultText.some(({x, y, rx, ry}) => {
           if (Math.abs(x - rx) > unitPrecision || Math.abs(y - ry) > unitPrecision) {
             return false
@@ -471,11 +502,6 @@ export default {
       this.$refs.ok.style.display = 'block'
     },
     handleInputBlur() {
-      setTimeout(() => {
-        const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0
-        window.scrollTo(0, Math.max(scrollHeight - 1, 0))
-      }, 100)
-
       this.$refs.next.style.display = 'block'
 
       if (!this.inputContent) {
@@ -502,7 +528,7 @@ export default {
       const shuffle = arr => {
         let n = arr.length, random
         while(0 !== n){
-          random =  (Math.random() * n--) >>> 0; // 无符号右移位运算符向下取整
+          random = (Math.random() * n--) >>> 0; // 无符号右移位运算符向下取整
           [arr[n], arr[random]] = [arr[random], arr[n]] // ES6的结构赋值实现变量互换
         }
         return arr
@@ -513,7 +539,7 @@ export default {
         this.$refs['rotate-btn'].style.transform = `rotate(${this.angle}deg)`
       }
       
-      
+
       rotate()
       this.flagTextList = new Array(6).fill(0).map((item, index) => shuffle(FLAGS)[index])
     },
@@ -647,7 +673,7 @@ export default {
                 <div ref="placeholder" class={style['placeholder']}>
                   <div class={style['left-line']}></div>
                 </div>
-                <input onBlur={this.handleInputBlur} onFocus={this.handleInputFocus} value={this.inputContent} onInput={this.handleChangeInputValue} type="text" id="input" class={style['input']} />
+                <input v-scrollToTopOnBlur onBlur={this.handleInputBlur} onFocus={this.handleInputFocus} value={this.inputContent} onInput={this.handleChangeInputValue} type="text" id="input" class={style['input']} />
                 <div class={style['right-line']}></div>
                 <div ref="ok" onClick={this.handleConfirmInput} class={style['ok']}></div>
               </div>

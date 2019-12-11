@@ -112,11 +112,6 @@ export default {
       this.$refs.namePlaceholder.style.display = 'none'
     },
     handleInputBlur() {
-      setTimeout(() => {
-        const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0
-        window.scrollTo(0, Math.max(scrollHeight - 1, 0))
-      }, 100)
-
       if (!this.nameInputValue) {
         this.$refs.namePlaceholder.style.display = 'block'
       }
@@ -167,7 +162,7 @@ export default {
                 value={this.nameInputValue}
                 onInput={this.handleNameInputChange}
                 ref="nameInput"
-                onBlur={this.handleInputBlur}
+                v-scrollToTopOnBlur
                 onFocus={this.handleInputFocus}
                 type="text"
                 class={style['name']} />

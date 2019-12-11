@@ -355,12 +355,12 @@ export default {
       
     },
     drawDate(ctx) {
-      const { days, hours, mins, seconds, isFeature } = calcDate(dayjs('2019-02-05').unix())
+      const { days, hours, mins, seconds, isFeature } = calcDate(dayjs('2020-01-01').unix())
       
       ctx.font = "56px text"
       ctx.fillStyle = '#000'
       ctx.textAlign = "left"
-      const titleText = isFeature ? '距离2019年春节还有' : '2019年春节已经过去了' 
+      const titleText = isFeature ? '距离2020新年还有' : '200年新年已经过去了' 
       ctx.fillText(titleText, (this.myCanvas.width - ctx.measureText(titleText).width) / 2, 140)
       
       ctx.font = "160px text"
