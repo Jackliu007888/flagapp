@@ -1,5 +1,5 @@
 {
-  "name": "flag-01",
+  "name": "flagapp",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,9 +12,9 @@
     "fastclick": "^1.0.6",
     "howler": "^2.1.0",
     "html2canvas": "^1.0.0-alpha.12",
-    "konva": "^2.6.0",
+    "konva": "^4.0.18",
     "normalize.css": "^8.0.1",
-    "qrcodejs": "github:shenhudong/qrcodejs#23351508c97c043ac72839dd810ab58eff3e9fe9",
+    "qrcodejs": "https://github.com/Jackliu007888/qrcodejs#ecd7b7c6d1acee8edaf4b2144b0e297663950e21",
     "ua-device": "^0.1.10",
     "vue": "^2.5.17",
     "vue-konva": "^2.0.0",
@@ -25,7 +25,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.2.0",
     "@vue/cli-plugin-eslint": "^3.2.0",
-    "@vue/cli-service": "^3.2.0",
+    "@vue/cli-service": "^4.1.1",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.8.0",
     "eslint-plugin-vue": "^5.0.0-0",

@@ -1,7 +1,7 @@
 import goImg from '@/assets/img/make-flag/go.png'
 import goClickImg from '@/assets/img/make-flag/go_click.png'
 import triangleImg from '@/assets/img/make-flag/triangle.png'
-import Konva from 'Konva'
+import Konva from 'konva'
 import style from './index.module.styl'
 
 import FLAGS from './flags'
@@ -223,7 +223,7 @@ export default {
         y: 120,
         image: flagBgImage.instance
       }
-      this.$options.peopleConfig, {
+      this.$options.peopleConfig = {
         image: peopleImage.instance,
         width: 352,
         height: 344,

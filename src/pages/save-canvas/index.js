@@ -53,7 +53,7 @@ export default {
       let width = shareContent.offsetWidth //获取dom 宽度
       let height = shareContent.offsetHeight //获取dom 高度
       let canvas = document.createElement("canvas") //创建一个canvas节点
-      let scale = 2 //定义任意放大倍数 支持小数
+      let scale = 1 //定义任意放大倍数 支持小数
       canvas.width = width * scale //定义canvas 宽度 * 缩放
       canvas.height = height * scale //定义canvas高度 *缩放
       canvas.getContext("2d").scale(scale, scale) //获取context,设置scale 

@@ -26,7 +26,7 @@ export default {
       rulerChanged: false,
       chooseMainColor: COLOR_LIST[0].main,
       step3Checked: false,
-      nameInputValue: null
+      nameInputValue: ''
     }
   },
   mounted() {
@@ -90,6 +90,7 @@ export default {
       }, 300)
       setTimeout(() => {
         this.$refs.step2.style.display = 'none'
+        this.$refs.bottomSettings.style.display = 'none'
       }, 600)
     },
     handleClickStep3Check() {
@@ -118,6 +119,16 @@ export default {
     },
     handleNameInputChange(e) {
       this.nameInputValue = e.currentTarget.value
+    },
+    handleNameInputBlur() {
+      this.nameInputValue = this.nameInputValue.replace(/(^\s*)|(\s*$)/g, "")
+      if (this.nameInputValue.length === 0) {
+        this.$refs.namePlaceholder.style.display = 'block'
+      }
+      setTimeout(function() {
+        let e = document.documentElement.scrollTop || document.body.scrollTop || 0
+        window.scrollTo(0, Math.max(e - 1, 0))
+      }, 50)
     }
   },
   render(h) {
@@ -161,9 +172,8 @@ export default {
               <input
                 value={this.nameInputValue}
                 onInput={this.handleNameInputChange}
+                onBlur={this.handleNameInputBlur}
                 ref="nameInput"
-                v-scrollToTopOnBlur
-                onFocus={this.handleInputFocus}
                 type="text"
                 class={style['name']} />
               <div class={style['name-mask']}></div>
@@ -191,7 +201,7 @@ export default {
           </div>
           <img src={this.currentImage} />
         </div>
-        <div style={this.isStep3 && `transform: translate3d(0, 21rem, 0)`} class={style['bottom-settings']}>
+        <div ref='bottomSettings' style={this.isStep3 && `transform: translate3d(0, 21rem, 0)`} class={style['bottom-settings']}>
           <div class={style['choose-main']}>
             <div style={this.currentChooser === CHOOSER[0] ? 'display: block;' : 'display: none;' } class={style['colors-box']}>
               <div class={style['colors-main']}>

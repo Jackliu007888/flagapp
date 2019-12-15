@@ -25,6 +25,9 @@ const httpPluginConfig = {
 
 Vue.use(httpPlugin, httpPluginConfig)
 
+FastClick.prototype.focus = function(targetElement) {
+  targetElement.focus()
+}
 FastClick.attach(document.body)
 
 Vue.use(VueRouter)

@@ -7,7 +7,7 @@ import style from './index.module.styl'
 import coundDownPage from '@/pages/countdown'
 import makeFlagPage from '@/pages/make-flag'
 import selectBgPage from '@/pages/select-bg'
-
+import { Howl } from 'howler'
 
 const baseUrl = 'https://static.ws.126.net/163/f2e/news/dada2018_newyear/img/'
 
@@ -63,13 +63,13 @@ const IMAGE_LIST = [
 
 const FONT_LIST = [{
   type: 'font',
-  value: 'http://static.ws.126.net/163/f2e/news/happynewyear2019/img/text1.ttf'
+  value: 'https://static.ws.126.net/163/f2e/news/happynewyear2019/img/text1.ttf'
 }, {
   type: 'font',
-  value: 'http://static.ws.126.net/163/f2e/news/happynewyear2019/img/font.ttf'
+  value: 'https://static.ws.126.net/163/f2e/news/happynewyear2019/img/font.ttf'
 }, {
   type: 'font',
-  value: 'http://static.ws.126.net/163/f2e/news/happynewyear2019/img/eng.ttf'
+  value: 'https://static.ws.126.net/163/f2e/news/happynewyear2019/img/eng.ttf'
 }]
 
 export default {
@@ -143,6 +143,25 @@ export default {
         that.coundDownPagevisible = true
       }
     })
+
+    const sound = new Howl({
+      src: ['https://static.ws.126.net/163/f2e/news/happynewyear2019/img/bgm.mp3?1560415077420'],
+      autoplay: true,
+      loop: true,
+      volume: 0.5,
+      onend: function() {
+        console.log('Finished!')
+      }
+    })
+
+    const playAudio = () => {
+      sound.load()
+      sound.play()
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      playAudio()
+    }, false)
   },
   methods: {
     handleSaveImageSuccess(val) {

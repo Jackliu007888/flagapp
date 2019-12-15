@@ -1,5 +1,6 @@
 import { calcDate } from '@/common/js/countdown'
 import dayjs from 'dayjs'
+import TEXT_IMAGE from '@/assets/img/countdown/bottom_text.png'
 
 const isInRange = (p0, p1, range = 70) => {
   return Math.abs(p0 - p1) <= range
@@ -11,7 +12,6 @@ const CICLE_DOT_TOP_POSTION = [CICLE_CENTER[0], CICLE_CENTER[1] - CICLE_R]
 const TRANCE_LEN = 10
 
 const AUDIO_IMAGE = 'https://static.ws.126.net/163/f2e/news/dada2018_newyear/img/first/music.png'
-const TEXT_IMAGE = 'https://static.ws.126.net/163/f2e/news/dada2018_newyear/img/first/bottom_text.png'
 
 export default {
   props: ['startImageList', 'transformImageList', 'visible'],
