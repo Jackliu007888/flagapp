@@ -1,4 +1,3 @@
-/* global process */
 import Utils from './utils'
 import { ERROR_TYPE } from './enum'
 
